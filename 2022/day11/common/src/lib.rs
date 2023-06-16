@@ -5,7 +5,7 @@ pub mod math {
         Add(Symbol, Symbol),
     }
     impl Operator {
-        pub fn eval(&self, old: i32) -> i32 {
+        pub fn eval(&self, old: i64) -> i64 {
             match self {
                 Operator::Add(left, right) => left.unwrap(old) + right.unwrap(old),
                 Operator::Mult(left, right) => left.unwrap(old) * right.unwrap(old),
@@ -26,10 +26,10 @@ pub mod math {
     #[derive(Debug)]
     pub enum Symbol {
         Old,
-        Number(i32),
+        Number(i64),
     }
     impl Symbol {
-        fn unwrap(&self, value: i32) -> i32 {
+        fn unwrap(&self, value: i64) -> i64 {
             match self {
                 Symbol::Old => value,
                 Symbol::Number(num) => *num,
@@ -38,7 +38,7 @@ pub mod math {
         fn from_string(symbol: &str) -> Self {
             match symbol {
                 "old" => Self::Old,
-                _ => Symbol::Number(symbol.parse::<i32>().unwrap()),
+                _ => Symbol::Number(symbol.parse::<i64>().unwrap()),
             }
         }
     }
