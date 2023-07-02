@@ -121,38 +121,44 @@ impl State {
         new.geodes += self.geodebots;
         new
     }
-    fn get_max(&self, bp: &Blueprint, cache: &mut HashSet<State>) -> u8 {
+    fn can_beat(&self, score: u8) -> bool {
+        let max_possible = self.geodebots * self.time + sum_n_nums(self.time);
+        max_possible > score
+    }
+    fn get_max(&self, bp: &Blueprint, cache: &mut HashSet<State>, best: &mut u8) {
         if self.time == 0 {
-            self.geodes
-        } else if self.can_build(bp).contains(&Robot::Geode) {
-            self.step().build(&Robot::Geode, bp).get_max(bp, cache)
-        } else {
-            let mut result = 0;
-            if cache.insert(self.clone()) {
-                result = self.step().get_max(bp, cache);
-                result = std::cmp::max(
-                    result,
-                    self.can_build(bp)
-                        .iter()
-                        .map(|bot| self.step().build(bot, bp).get_max(bp, cache))
-                        .max()
-                        .unwrap_or_default(),
-                );
+            if self.geodes > *best {
+                *best = self.geodes;
             }
-            result
+        } else if self.can_build(bp).contains(&Robot::Geode) {
+            self.step()
+                .build(&Robot::Geode, bp)
+                .get_max(bp, cache, best);
+        } else {
+            if cache.insert(self.clone()) {
+                self.step().get_max(bp, cache, best);
+                self.can_build(bp)
+                    .iter()
+                    .for_each(|bot| self.step().build(bot, bp).get_max(bp, cache, best));
+            }
         }
     }
 }
 fn trim_end(input: &str) -> &str {
     &input[0..input.len() - 1]
 }
-fn solve(input: &str) -> u8 {
+fn sum_n_nums(n: u8) -> u8 {
+    n / 2 * (n + 1)
+}
+pub fn solve(input: &str) -> u8 {
     let state = State::new(24);
     Blueprint::build(input)
         .iter()
         .map(|bp| {
             let mut cache = HashSet::new();
-            state.get_max(bp, &mut cache) * bp.id
+            let mut best = 0;
+            state.get_max(bp, &mut cache, &mut best);
+            best * bp.id
         })
         .sum()
 }
@@ -160,6 +166,10 @@ fn solve(input: &str) -> u8 {
 #[cfg(test)]
 mod test {
     use super::*;
+    #[test]
+    fn sumnums() {
+        assert_eq!(sum_n_nums(10), 55);
+    }
     #[test]
     fn trimming() {
         let input = "blah:";
@@ -192,7 +202,9 @@ mod test {
         };
         let state = State::new(24);
         let mut cache = HashSet::new();
-        assert_eq!(state.get_max(&bp, &mut cache), 9);
+        let mut best = 0;
+        state.get_max(&bp, &mut cache, &mut best);
+        assert_eq!(best, 9);
     }
     #[test]
     fn get_max2() {
@@ -205,7 +217,9 @@ mod test {
         };
         let state = State::new(24);
         let mut cache = HashSet::new();
-        assert_eq!(state.get_max(&bp, &mut cache), 12);
+        let mut best = 0;
+        state.get_max(&bp, &mut cache, &mut best);
+        assert_eq!(best, 12);
     }
     #[test]
     fn solve_test() {
