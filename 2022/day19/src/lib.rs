@@ -16,7 +16,27 @@ struct Blueprint {
 }
 impl Blueprint {
     fn build(input: &str) -> Vec<Self> {
-        Vec::new()
+        input
+            .lines()
+            .filter(|line| !line.is_empty())
+            .map(|line| {
+                let mut tokens = line.split_whitespace();
+                let id = trim_end(tokens.nth(1).unwrap()).parse().unwrap();
+                Blueprint {
+                    id,
+                    ore: tokens.nth(4).unwrap().parse().unwrap(),
+                    clay: tokens.nth(5).unwrap().parse().unwrap(),
+                    obsidian: (
+                        tokens.nth(5).unwrap().parse().unwrap(),
+                        tokens.nth(2).unwrap().parse().unwrap(),
+                    ),
+                    geode: (
+                        tokens.nth(5).unwrap().parse().unwrap(),
+                        tokens.nth(2).unwrap().parse().unwrap(),
+                    ),
+                }
+            })
+            .collect()
     }
 }
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -123,10 +143,34 @@ impl State {
         }
     }
 }
+fn trim_end(input: &str) -> &str {
+    &input[0..input.len() - 1]
+}
 
 #[cfg(test)]
 mod test {
     use super::*;
+    #[test]
+    fn trimming() {
+        let input = "blah:";
+        assert_eq!(trim_end(input), "blah");
+    }
+    #[test]
+    fn build_bp() {
+        let input = include_str!("../testinput");
+        let bps = Blueprint::build(input);
+        assert_eq!(bps.len(), 2);
+    }
+    #[test]
+    fn bp_values() {
+        let input = include_str!("../testinput");
+        let bps = Blueprint::build(input);
+        let bp = &bps[0];
+        assert_eq!(bp.ore, 4);
+        assert_eq!(bp.clay, 2);
+        assert_eq!(bp.obsidian, (3, 14));
+        assert_eq!(bp.geode, (2, 7));
+    }
     #[test]
     fn get_max() {
         let bp = Blueprint {
