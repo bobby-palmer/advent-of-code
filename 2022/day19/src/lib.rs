@@ -162,6 +162,20 @@ pub fn solve(input: &str) -> u16 {
         })
         .sum()
 }
+pub fn solveb(input: &str) -> u16 {
+    let state = State::new(32);
+    Blueprint::build(input)
+        .iter()
+        .enumerate()
+        .filter(|(index, _)| *index < 3)
+        .map(|(_, bp)| {
+            let mut cache = HashSet::new();
+            let mut best = 0;
+            state.get_max(bp, &mut cache, &mut best);
+            best as u16
+        })
+        .product()
+}
 
 #[cfg(test)]
 mod test {
