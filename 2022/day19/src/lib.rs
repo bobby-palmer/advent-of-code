@@ -1,4 +1,6 @@
 use std::collections::HashSet;
+
+#[derive(PartialEq, Eq)]
 enum Robot {
     Ore,
     Clay,
@@ -6,6 +8,7 @@ enum Robot {
     Geode,
 }
 struct Blueprint {
+    id: u8,
     ore: u8,
     clay: u8,
     obsidian: (u8, u8),
@@ -101,6 +104,8 @@ impl State {
     fn get_max(&self, bp: &Blueprint, cache: &mut HashSet<State>) -> u8 {
         if self.time == 0 {
             self.geodes
+        } else if self.can_build(bp).contains(&Robot::Geode) {
+            self.step().build(&Robot::Geode, bp).get_max(bp, cache)
         } else {
             let mut result = 0;
             if cache.insert(self.clone()) {
@@ -125,6 +130,7 @@ mod test {
     #[test]
     fn get_max() {
         let bp = Blueprint {
+            id: 1,
             ore: 4,
             clay: 2,
             obsidian: (3, 14),
@@ -133,5 +139,18 @@ mod test {
         let state = State::new(24);
         let mut cache = HashSet::new();
         assert_eq!(state.get_max(&bp, &mut cache), 9);
+    }
+    #[test]
+    fn get_max2() {
+        let bp = Blueprint {
+            id: 1,
+            ore: 2,
+            clay: 3,
+            obsidian: (3, 8),
+            geode: (3, 12),
+        };
+        let state = State::new(24);
+        let mut cache = HashSet::new();
+        assert_eq!(state.get_max(&bp, &mut cache), 12);
     }
 }
