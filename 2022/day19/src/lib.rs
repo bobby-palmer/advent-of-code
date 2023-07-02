@@ -146,6 +146,16 @@ impl State {
 fn trim_end(input: &str) -> &str {
     &input[0..input.len() - 1]
 }
+fn solve(input: &str) -> u8 {
+    let state = State::new(24);
+    Blueprint::build(input)
+        .iter()
+        .map(|bp| {
+            let mut cache = HashSet::new();
+            state.get_max(bp, &mut cache) * bp.id
+        })
+        .sum()
+}
 
 #[cfg(test)]
 mod test {
@@ -196,5 +206,10 @@ mod test {
         let state = State::new(24);
         let mut cache = HashSet::new();
         assert_eq!(state.get_max(&bp, &mut cache), 12);
+    }
+    #[test]
+    fn solve_test() {
+        let input = include_str!("../testinput");
+        assert_eq!(solve(input), 33);
     }
 }
