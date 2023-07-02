@@ -150,7 +150,7 @@ impl State {
 fn trim_end(input: &str) -> &str {
     &input[0..input.len() - 1]
 }
-pub fn solve(input: &str) -> u8 {
+pub fn solve(input: &str) -> u16 {
     let state = State::new(24);
     Blueprint::build(input)
         .iter()
@@ -158,7 +158,7 @@ pub fn solve(input: &str) -> u8 {
             let mut cache = HashSet::new();
             let mut best = 0;
             state.get_max(bp, &mut cache, &mut best);
-            best * bp.id
+            (best * bp.id) as u16
         })
         .sum()
 }
