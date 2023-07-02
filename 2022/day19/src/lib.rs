@@ -122,14 +122,17 @@ impl State {
         new
     }
     fn can_beat(&self, score: u8) -> bool {
-        let max_possible = self.geodebots * self.time + sum_n_nums(self.time);
-        max_possible > score
+        let max_future: u16 =
+            (self.geodebots * self.time) as u16 + self.time as u16 / 2 * (self.time as u16 - 1);
+        max_future + self.geodes as u16 > score.into()
     }
     fn get_max(&self, bp: &Blueprint, cache: &mut HashSet<State>, best: &mut u8) {
         if self.time == 0 {
             if self.geodes > *best {
                 *best = self.geodes;
             }
+        } else if !self.can_beat(*best) {
+            return;
         } else if self.can_build(bp).contains(&Robot::Geode) {
             self.step()
                 .build(&Robot::Geode, bp)
@@ -147,9 +150,6 @@ impl State {
 fn trim_end(input: &str) -> &str {
     &input[0..input.len() - 1]
 }
-fn sum_n_nums(n: u8) -> u8 {
-    n / 2 * (n + 1)
-}
 pub fn solve(input: &str) -> u8 {
     let state = State::new(24);
     Blueprint::build(input)
@@ -166,10 +166,6 @@ pub fn solve(input: &str) -> u8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    #[test]
-    fn sumnums() {
-        assert_eq!(sum_n_nums(10), 55);
-    }
     #[test]
     fn trimming() {
         let input = "blah:";
