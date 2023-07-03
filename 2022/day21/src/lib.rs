@@ -5,7 +5,12 @@ fn get<'a>(input: &'a str, name: &str) -> &'a str {
             let (thisname, _) = line.split_at(4);
             thisname == name
         })
-        .unwrap()
+        .unwrap().split_at(6).1
+}
+
+fn parse(input: &str, name: &str) -> i32 {
+    let val = get(input, name);
+    0
 }
 #[cfg(test)]
 mod test {
@@ -13,7 +18,7 @@ mod test {
     #[test]
     fn getter() {
         let input = include_str!("../testinput");
-        let example = "drzm: hmdt - zczc";
+        let example = "hmdt - zczc";
         assert_eq!(example, get(input, "drzm"));
     }
 }
