@@ -1,6 +1,8 @@
 const FIRST: usize = 1000;
 const SECOND: usize = 2000;
 const THIRD: usize = 3000;
+const KEY: i64 = 811589153;
+
 #[derive(Debug)]
 struct File(Vec<Item>);
 impl File {
@@ -68,6 +70,13 @@ pub fn solve(input: &str) -> i32 {
     file.mix();
     file.get_coords()
 }
+pub fn solve_b(input: &str) -> i64 {
+    let mut file = File::build(input);
+    for _ in 0..10 {
+        file.mix();
+    }
+    file.get_coords() as i64 * KEY
+}
 #[cfg(test)]
 mod test {
     use super::*;
@@ -106,5 +115,10 @@ mod test {
         let mut file = File::build(input);
         file.mix();
         assert_eq!(file.get_coords(), 3);
+    }
+    #[test]
+    fn decrypt_10() {
+        let input = include_str!("../testinput");
+        assert_eq!(solve_b(input), 1623178306);
     }
 }
