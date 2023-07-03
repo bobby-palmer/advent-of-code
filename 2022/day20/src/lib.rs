@@ -14,7 +14,7 @@ impl File {
     fn mix_one(&mut self, index: usize) {
         let item = self.0.remove(index);
         let new_index: usize =
-            ((index as i32 + item.value).rem_euclid(self.0.len() as i32)) as usize;
+            ((index as i64 + item.value).rem_euclid(self.0.len() as i64)) as usize;
         self.0.insert(new_index, item)
     }
     fn find_index(&self, index: usize) -> usize {
@@ -29,7 +29,7 @@ impl File {
         self.0
             .iter()
             .enumerate()
-            .find(|(_, item)| item.value == value)
+            .find(|(_, item)| item.value == value as i64)
             .unwrap()
             .0
     }
@@ -44,38 +44,44 @@ impl File {
                 .collect(),
         )
     }
-    fn get_coords(&self) -> i32 {
+    fn get_coords(&self) -> i64 {
         let base = self.find_value(0);
         let first = (base + FIRST) % self.0.len();
         let second = (base + SECOND) % self.0.len();
         let third = (base + THIRD) % self.0.len();
         self.0[first].value + self.0[second].value + self.0[third].value
     }
+    fn amp(&mut self, amount: i64) {
+        self.0.iter_mut().for_each(|item| {
+            item.value *= amount;
+        });
+    }
 }
 #[derive(Debug)]
 struct Item {
     index: usize,
-    value: i32,
+    value: i64,
 }
 impl Item {
-    fn build(tuple: (usize, i32)) -> Self {
+    fn build(tuple: (usize, i64)) -> Self {
         Item {
             index: tuple.0,
             value: tuple.1,
         }
     }
 }
-pub fn solve(input: &str) -> i32 {
+pub fn solve(input: &str) -> i64 {
     let mut file = File::build(input);
     file.mix();
     file.get_coords()
 }
 pub fn solve_b(input: &str) -> i64 {
     let mut file = File::build(input);
+    file.amp(KEY);
     for _ in 0..10 {
         file.mix();
     }
-    file.get_coords() as i64 * KEY
+    file.get_coords()
 }
 #[cfg(test)]
 mod test {
