@@ -8,9 +8,8 @@ fn get<'a>(input: &'a str, name: &str) -> &'a str {
         .unwrap().split_at(6).1
 }
 
-fn parse(input: &str, name: &str) -> i32 {
+fn parse(input: &str, name: &str) -> i64 {
     let val = get(input, name);
-    println!("{val}");
     if let Some(num) = val.parse().ok() {
         num
     } else {
@@ -26,6 +25,11 @@ fn parse(input: &str, name: &str) -> i32 {
             _ => unreachable!(),
         }
     }
+}
+pub fn solve() {
+    let input = include_str!("../input");
+    let solution = parse(input, "root");
+    println!("{solution}");
 }
 #[cfg(test)]
 mod test {
