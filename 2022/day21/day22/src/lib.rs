@@ -21,6 +21,33 @@ impl Map {
         (0, self.0[0].iter().position(|spot| *spot == Some(Spot::Open)).unwrap())
     }
 }
+enum Direction {
+    Up,
+    Right,
+    Down,
+    Left,
+}
+struct State {
+    facing: Direction,
+    row: usize,
+    col: usize,
+    map: Map,
+    instructions: &'static str,
+}
+impl State {
+    fn build(input: &'static str) -> Self {
+        let (map_str, instructions) = input.split_once("\n\n").unwrap();
+        let map = Map::build(map_str);
+        let (row, col) = map.get_tl();
+        State {
+            facing: Direction::Right,
+            row,
+            col,
+            map,
+            instructions,
+        }
+    }
+}
 #[cfg(test)]
 mod test {
     use super::*;
