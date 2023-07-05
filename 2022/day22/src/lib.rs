@@ -47,6 +47,42 @@ impl State {
             instructions,
         }
     }
+    fn inc_row(&self) -> usize {
+        if self.map.0[(self.row + 1).rem_euclid(self.map.0.len())][self.col].is_some() {
+            self.row + 1
+        } else {
+            self.map.0.iter().position(|row| row[self.col].is_some()).unwrap()
+        }
+    }
+    fn dec_row(&self) -> usize {
+        if self.map.0[(self.row - 1).rem_euclid(self.map.0.len())][self.col].is_some() {
+            self.row - 1
+        } else {
+            let mut row = self.row;
+            while self.map.0[row][self.col].is_some(){
+                continue;
+            }
+            row - 1
+        }
+    }
+    fn inc_col(&self) -> usize {
+        if self.map.0[self.row][(self.col + 1)].is_some() {
+            self.col + 1
+        } else {
+            self.map.0.iter().position(|row| row[self.col].is_some()).unwrap()
+        }
+    }
+    fn dec_col(&self) -> usize {
+
+    }
+    fn do_move(&mut self, direction: Direction) {
+        let (row, col) = match direction {
+            Direction::Up => (self.dec_row(), self.col),
+            Direction::Down => (self.inc_row(), self.col),
+            Direction::Right => (self.row, self.inc_col()),
+            Direction::Left => (self.row, self.dec_col()),
+        };
+    }
 }
 #[cfg(test)]
 mod test {
