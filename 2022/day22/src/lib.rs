@@ -6,7 +6,7 @@ enum Spot {
 struct Map(Vec<Vec<Option<Spot>>>);
 impl Map {
     fn build(input: &'static str) -> Self {
-            Map(input.lines().map(|line| {
+            let map = input.lines().map(|line| {
             line.chars().map(|letter| {
                 match letter {
                     ' ' => None,
@@ -15,7 +15,9 @@ impl Map {
                     _ => unreachable!(),
                 }
             }).collect()
-        }).collect())
+        }).collect();
+
+        Map(map)
     }
     fn get_tl(&self) -> (usize, usize) {
         (0, self.0[0].iter().position(|spot| *spot == Some(Spot::Open)).unwrap())
@@ -25,6 +27,13 @@ impl Map {
     }
     fn width(&self) -> usize {
         self.0[0].len()
+    }
+    fn get(&self, row:usize, col:usize) -> Option<&Spot> {
+        match self.0.get(row).unwrap().get(col) {
+            None => None,
+            Some(None) => None,
+            Some(x) => x.as_ref(),
+        }
     }
 }
 #[derive(Debug,PartialEq, Eq, Clone)]
@@ -81,13 +90,14 @@ impl State {
         }
     }
     fn do_move(&mut self, direction: &Direction) {
+        println!("{}", self.col);
         let (row, col) = match direction {
             Direction::Up => {
                 let mut row = self.row.checked_sub(1).unwrap_or_else(|| self.map.height() - 1);
-                while self.map.0[row][self.col].is_none() {
+                while self.map.get(row, self.col).is_none() {
                     row = row.checked_sub(1).unwrap_or_else(|| self.map.height() - 1);
                 }
-                match self.map.0[row][self.col] {
+                match self.map.get(row,self.col) {
                     Some(Spot::Open) => (row, self.col),
                     Some(Spot::Blocked) => (self.row, self.col),
                     _ => unreachable!(),
@@ -95,10 +105,10 @@ impl State {
             },
             Direction::Down => {
                 let mut row = (self.row + 1).rem_euclid(self.map.height());
-                while self.map.0[row][self.col].is_none() {
+                while self.map.get(row, self.col).is_none() {
                     row = (row + 1).rem_euclid(self.map.height());
                 }
-                match self.map.0[row][self.col] {
+                match self.map.get(row, self.col) {
                     Some(Spot::Open) => (row, self.col),
                     Some(Spot::Blocked) => (self.row, self.col),
                     _ => unreachable!(),
@@ -106,10 +116,10 @@ impl State {
             },
             Direction::Right => {
                 let mut col = (self.col + 1).rem_euclid(self.map.width());
-                while self.map.0[self.row][col].is_none() {
+                while self.map.get(self.row,col).is_none() {
                     col = (col + 1).rem_euclid(self.map.width());
                 }
-                match self.map.0[self.row][col] {
+                match self.map.get(self.row,col) {
                     Some(Spot::Open) => (self.row, col),
                     Some(Spot::Blocked) => (self.row, self.col),
                     _ => unreachable!(),
@@ -117,10 +127,10 @@ impl State {
             },
             Direction::Left => {
                 let mut col = self.col.checked_sub(1).unwrap_or_else(|| self.map.width());
-                while self.map.0[self.row][col].is_none() {
+                while self.map.get(self.row,col).is_none() {
                     col = col.checked_sub(1).unwrap_or_else(|| self.map.width() - 1);
                 }
-                match self.map.0[self.row][col] {
+                match self.map.get(self.row,col) {
                     Some(Spot::Open) => (self.row, col),
                     Some(Spot::Blocked) => (self.row, self.col),
                     _ => unreachable!(),
