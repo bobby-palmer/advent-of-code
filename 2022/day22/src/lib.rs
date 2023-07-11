@@ -225,4 +225,9 @@ mod test {
         let input = include_str!("../testinput");
         assert_eq!(solve(input), 6032);
     }
+    #[test]
+    fn test_actual() {
+        let input = include_str!("../input");
+        assert_eq!(solve(input), 89224);
+    }
 }
