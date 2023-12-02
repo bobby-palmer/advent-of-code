@@ -1,6 +1,8 @@
 use std::io;
 
+mod util;
 mod one;
+mod two;
 
 fn main() -> std::io::Result<()> {
     let mut input = String::new();
@@ -10,6 +12,7 @@ fn main() -> std::io::Result<()> {
 
     match input.trim() {
         "one" => one::solve("day1.txt")?,
+        "two" => two::solve()?,
         x => println!("{x} is not implemented yet!"),
     }
     Ok(())
